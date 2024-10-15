@@ -29,35 +29,35 @@ router.post('/registered', function (req, res, next) {
         result += ' Your password is: ' + plainPassword + ' and your hashed password is: ' + hashedPassword;
         // Send the result as a response
         res.send(result);
-        });
-    });
-    });
-  const redirectLogin = (req, res, next) => {
+        })
+    })
+})
+const redirectLogin = (req, res, next) => {
     if (!req.session.userId ) {
-      res.redirect('/login') // redirect to the login page
+        res.redirect('/login') // redirect to the login page
     } else { 
         next (); // move to the next middleware function
     } 
 }
-router.get('/list', function(req, res) {
-    let sqlquery = "SELECT * FROM Users"; // Query database to get all users
+router.get('/list', function(req, res, next) {
+    let sqlquery = "SELECT * FROM users"; // Query database to get all users
     db.query(sqlquery, (err, result) => {
         if (err) {
             next(err);
         }
-        res.render("listOfUsers.ejs", { availableUsers: result });
-    });
-});
+        res.render("listOfUsers.ejs", {availableUsers: result});
+    })
+})
 
 router.get('/loggedIn', (req, res) => {
   req.session.userId = req.body.username;
   res.render('index.ejs',{ userId: req.session.userId })
-});
+})
 
 // Login page
 router.get('/login', (req, res) => {
   res.render('login.ejs');
-});
+})
   
   // Logout route
 router.get('/logout', redirectLogin, (req, res) => {
@@ -66,8 +66,8 @@ router.get('/logout', redirectLogin, (req, res) => {
           return res.redirect('./'); // Redirect if an error occurs
       }
       res.send('You are now logged out. <a href="./">Home</a>'); // Confirmation message
-  });
-});
+  })
+})
 
 router.post('/login', (req, res) => {
   const sqlquery = "SELECT * FROM Users WHERE username = ?"; // Query to get the user by username
@@ -101,9 +101,9 @@ router.post('/login', (req, res) => {
               // Passwords do not match - authentication failed
               res.send('Invalid password. <a href="login">Try again</a>');
           }
-      });
-  });
-});
+      })
+  })
+})
 
 // Export the router object so index.js can access it
 module.exports = router
