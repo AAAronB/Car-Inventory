@@ -32,76 +32,78 @@ router.post('/registered', function (req, res, next) {
         });
     });
     });
-
+  const redirectLogin = (req, res, next) => {
+    if (!req.session.userId ) {
+      res.redirect('/login') // redirect to the login page
+    } else { 
+        next (); // move to the next middleware function
+    } 
+}
 router.get('/list', function(req, res) {
-    let sqlquery = "SELECT * FROM Users"; // query database to get all the Users
-    // execute sql query
+    let sqlquery = "SELECT * FROM Users"; // Query database to get all users
     db.query(sqlquery, (err, result) => {
         if (err) {
-           next(err)
+            next(err);
         }
-        res.render("listOfUsers.ejs", {availableUsers:result});
-     });
-  });
+        res.render("listOfUsers.ejs", { availableUsers: result });
+    });
+});
 
-  function isLoggedIn(req, res, next) {
-    if (req.session.user) {
-    next();
-    } else {
-    res.redirect('register');
-    }
-}
-  router.get('/', isLoggedIn, (req, res) => {
-    res.render('index.ejs')
-  });
-  
-  // Login page
-  router.get('/login', (req, res) => {
-    res.render('login.ejs');
-  });
+router.get('/loggedIn', (req, res) => {
+  req.session.userId = req.body.username;
+  res.render('index.ejs',{ userId: req.session.userId })
+});
+
+// Login page
+router.get('/login', (req, res) => {
+  res.render('login.ejs');
+});
   
   // Logout route
-  router.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.redirect('/login');
-  });
-
-  router.post('/login', (req, res) => {
-    let sqlquery = "SELECT * FROM Users WHERE username = ?"; // query the database to get the user by username
-    const username = req.body.username;
-    const saltRounds = 10;
-    isMatch = false;
-    // Execute SQL query
-    db.query(sqlquery, [username], (err, result) => {
+router.get('/logout', redirectLogin, (req, res) => {
+  req.session.destroy(err => {
       if (err) {
-        res.redirect('./');  // redirects to the home page if the query fails
-        return;
+          return res.redirect('./'); // Redirect if an error occurs
+      }
+      res.send('You are now logged out. <a href="./">Home</a>'); // Confirmation message
+  });
+});
+
+router.post('/login', (req, res) => {
+  const sqlquery = "SELECT * FROM Users WHERE username = ?"; // Query to get the user by username
+  const username = req.body.username;
+
+  // Execute SQL query
+  db.query(sqlquery, [username], (err, result) => {
+      if (err) {
+          res.redirect('./');  // Redirects to the home page if the query fails
+          return;
       }
       // Check if user was found
       if (result.length === 0) {
-        res.redirect('register');
-        return;
+          res.redirect('register'); // User not found, redirect to register
+          return;
       }
-      const user = result[0]; // Get the first result (should be the user object)
-      bcrypt.hash(req.body.password, saltRounds, function (err, hashedPassword) {
-              // Compare the password supplied with the hashed password in the database
-        bcrypt.compare(req.body.password, hashedPassword, function(err, isMatch) { // `isMatch` is the result of the comparison  
-            if (err) {
-                // Handle any error that occurred during password comparison
-                console.error('Error during password comparison:', err);
-                res.status(500).send('An error occurred. Please try again.');
-            } else if (isMatch) {
-                // Passwords match - authentication successful
-                // You can now send a success message or store the user in session, etc.
-                res.redirect('/');
-            } else {
-                // Passwords do not match - authentication failed
-                res.send('Invalid password. <a href="login">Try again</a>');
-            }
-        });  
+      
+      const user = result[0]; // Get the first result (the user object)
+
+      // Compare the password supplied with the hashed password in the database
+      bcrypt.compare(req.body.password, user.hashedPassword, (err, isMatch) => {
+          if (err) {
+              // Handle any error that occurred during password comparison
+              console.error('Error during password comparison:', err);
+              res.status(500).send('An error occurred. Please try again.');
+          } else if (isMatch) {
+              // Passwords match - authentication successful
+              req.session.userId = user.username; // Store user ID in session
+              res.redirect('/'); // Redirect to the home page
+          } else {
+              // Passwords do not match - authentication failed
+              res.send('Invalid password. <a href="login">Try again</a>');
+          }
       });
-    });
   });
-  
+});
+
 // Export the router object so index.js can access it
 module.exports = router

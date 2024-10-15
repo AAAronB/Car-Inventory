@@ -11,8 +11,11 @@ const app = express()
 const port = 8000
 app.use(session({
     secret: 'your-secret-key',
-    resave: true,
-    saveUninitialized: true
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        expires: 600000
+    }
   }));
 // Tell Express that we want to use EJS as the templating engine
 app.set('view engine', 'ejs')
