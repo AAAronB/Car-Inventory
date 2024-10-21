@@ -2,36 +2,46 @@
 const express = require("express")
 const router = express.Router()
 const bcrypt = require('bcrypt')
-
+const { check, validationResult } = require('express-validator');
 
 router.get('/register', function (req, res, next) {
     res.render('register.ejs')                                                               
-});    
+})   
 
-router.post('/registered', function (req, res, next) {
-    // saving data in database
-    const plainPassword = req.body.password;
-    const saltRounds = 10;
-    
-    // Hash the password
-    bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-        let addquery = "INSERT INTO users(first_name,last_name,username,password,email,hashedPassword) VALUES" + 
-        "('" + req.body.first + "','" + req.body.last + "','" + req.body.username + "','"+ plainPassword+ "','" + req.body.email + "','" + hashedPassword +"');";
-        db.query(addquery, (err) => {
-            if (err) {
-                return console.error(err.message); // returns an error message if the query fails
-             } else if (err) {
-            return res.status(500).send("Error hashing password.");
-        }
+router.post('/registered', [
+    check('email').isEmail(),
+], function (req, res, next) {
+    // Sanitize the inputs
+    const firstName = req.sanitize(req.body.first);
+    const lastName = req.sanitize(req.body.last);
+    const username = req.sanitize(req.body.username);
+    const email = req.sanitize(req.body.email);
+    const plainPassword = req.sanitize(req.body.password);
+    // Checking for errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.redirect('./register');
+    } else {
+        // Use firstName wherever necessary
+        const saltRounds = 10;
+        // Hash the password
+        bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
+            let addquery = "INSERT INTO users(first_name,last_name,username,password,email,hashedPassword) VALUES (?, ?, ?, ?, ?, ?)";
+            let newUser = [firstName, lastName, username, plainPassword, email, hashedPassword];
+            
+            db.query(addquery, newUser, (err) => {
+                if (err) {
+                    return console.error(err.message);
+                }
 
-        let result = 'Hello ' + req.body.first + ' ' + req.body.last + 
-                     ' you are now registered! We will send an email to you at ' + req.body.email;
-        result += ' Your password is: ' + plainPassword + ' and your hashed password is: ' + hashedPassword;
-        // Send the result as a response
-        res.send(result);
+                let result = 'Hello ' + firstName + ' ' + lastName + ' you are now registered! We will send an email to you at ' + email;
+                result += ' Your password is: ' + plainPassword + ' and your hashed password is: ' + hashedPassword;
+                res.send(result);
+            })
         })
-    })
+    }
 })
+
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId ) {
         res.redirect('/login') // redirect to the login page
@@ -59,7 +69,7 @@ router.get('/login', (req, res) => {
   res.render('login.ejs');
 })
   
-  // Logout route
+// Logout route
 router.get('/logout', redirectLogin, (req, res) => {
   req.session.destroy(err => {
       if (err) {
@@ -71,24 +81,22 @@ router.get('/logout', redirectLogin, (req, res) => {
 
 router.post('/login', (req, res) => {
   const sqlquery = "SELECT * FROM Users WHERE username = ?"; // Query to get the user by username
-  const username = req.body.username;
-
+  const username = req.sanitize(req.body.username);
+  const plainPassword = req.sanitize(req.body.password);
   // Execute SQL query
   db.query(sqlquery, [username], (err, result) => {
       if (err) {
-          res.redirect('./');  // Redirects to the home page if the query fails
-          return;
+        res.redirect('./');  // Redirects to the home page if the query fails
+        return;
       }
       // Check if user was found
       if (result.length === 0) {
-          res.redirect('register'); // User not found, redirect to register
-          return;
+        res.send('No username entered. <a href="register">Try register</a>');
+        return;
       }
-      
       const user = result[0]; // Get the first result (the user object)
-
       // Compare the password supplied with the hashed password in the database
-      bcrypt.compare(req.body.password, user.hashedPassword, (err, isMatch) => {
+      bcrypt.compare(plainPassword, user.hashedPassword, (err, isMatch) => {
           if (err) {
               // Handle any error that occurred during password comparison
               console.error('Error during password comparison:', err);
@@ -104,6 +112,5 @@ router.post('/login', (req, res) => {
       })
   })
 })
-
 // Export the router object so index.js can access it
 module.exports = router

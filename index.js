@@ -1,7 +1,9 @@
 // Import express and ejs
 var express = require ('express')
 var ejs = require('ejs')
-const session = require('express-session');
+var validator = require ('express-validator')
+const session = require('express-session')
+const expressSanitizer = require('express-sanitizer');
 
 //Import mysql module
 var mysql = require('mysql2')
@@ -25,6 +27,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // Set up public folder (for css and statis js)
 app.use(express.static(__dirname + '/public'))
+
+// Create an input sanitizer
+app.use(expressSanitizer());
 
 // Define the database connection
 const db = mysql.createConnection ({
