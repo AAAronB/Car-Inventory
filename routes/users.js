@@ -80,37 +80,42 @@ router.get('/logout', redirectLogin, (req, res) => {
 })
 
 router.post('/login', (req, res) => {
-  const sqlquery = "SELECT * FROM Users WHERE username = ?"; // Query to get the user by username
-  const username = req.sanitize(req.body.username);
-  const plainPassword = req.sanitize(req.body.password);
-  // Execute SQL query
-  db.query(sqlquery, [username], (err, result) => {
-      if (err) {
-        res.redirect('./');  // Redirects to the home page if the query fails
-        return;
-      }
-      // Check if user was found
-      if (result.length === 0) {
-        res.send('No username entered. <a href="register">Try register</a>');
-        return;
-      }
-      const user = result[0]; // Get the first result (the user object)
-      // Compare the password supplied with the hashed password in the database
-      bcrypt.compare(plainPassword, user.hashedPassword, (err, isMatch) => {
-          if (err) {
-              // Handle any error that occurred during password comparison
-              console.error('Error during password comparison:', err);
-              res.status(500).send('An error occurred. Please try again.');
-          } else if (isMatch) {
-              // Passwords match - authentication successful
-              req.session.userId = user.username; // Store user ID in session
-              res.redirect('/'); // Redirect to the home page
-          } else {
-              // Passwords do not match - authentication failed
-              res.send('Invalid password. <a href="login">Try again</a>');
-          }
-      })
+    const sqlquery = "SELECT * FROM Users WHERE username = ?"; // Query to get the user by username
+    const username = req.sanitize(req.body.username);
+    const plainPassword = req.sanitize(req.body.password);
+    
+    // Execute SQL query
+    db.query(sqlquery, [username], (err, result) => {
+        if (err) {
+          res.redirect('./');  // Redirect to the home page if the query fails
+          return;
+        }
+        
+        // Check if user was found
+        if (result.length === 0) {
+          // Always redirect to the registration page
+          res.redirect('register'); // Redirects to the register page
+          return;
+        }
+        
+        const user = result[0]; // Get the first result (the user object)
+        
+        // Compare the password supplied with the hashed password in the database
+        bcrypt.compare(plainPassword, user.hashedPassword, (err, isMatch) => {
+            if (err) {
+                // Handle any error that occurred during password comparison
+                console.error('Error during password comparison:', err);
+                res.status(500).send('An error occurred. Please try again.');
+            } else if (isMatch) {
+                // Passwords match - authentication successful
+                req.session.userId = user.username; // Store user ID in session
+                res.redirect('/'); // Redirect to the home page
+            } else {
+                // Passwords do not match - authentication failed
+                res.redirect('register'); // Redirect to the registration page
+            }
+        })
+    })
   })
-})
 // Export the router object so index.js can access it
 module.exports = router
