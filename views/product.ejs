@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Product Search</title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1>
+        Search for a product with: <%=shopData.shopName%>
+    </h1>
+    <form action="/find_products" method="get">
+        <label for="product">Enter a product name:</label>
+        <input type="text" id="product" name="product" required>
+        <button type="submit">Get Product</button>
+    </form>
+  </body>
+  </html>

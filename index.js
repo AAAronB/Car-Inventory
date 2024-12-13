@@ -34,9 +34,9 @@ app.use(expressSanitizer());
 // Define the database connection
 const db = mysql.createConnection ({
     host: 'localhost',
-    user: 'bettys_books_app',
+    user: 'tech_shop_products_app',
     password: 'qwertyuiop',
-    database: 'bettys_books'
+    database: 'tech_shop_products'
 })
 // Connect to the database
 db.connect((err) => {
@@ -48,7 +48,7 @@ db.connect((err) => {
 global.db = db
 
 // Define our application-specific data
-app.locals.shopData = {shopName: "Bettys Books"}
+app.locals.shopData = {shopName: "One Stop Tech Shop"}
 
 // Load the route handlers
 const mainRoutes = require("./routes/main")
@@ -58,9 +58,13 @@ app.use('/', mainRoutes)
 const usersRoutes = require('./routes/users')
 app.use('/users', usersRoutes)
 
-// Load the route handlers for /books
-const booksRoutes = require('./routes/books')
-app.use('/books', booksRoutes)
+// Load the route handlers for /products
+const productsRoutes = require('./routes/products')
+app.use('/products', productsRoutes)
+
+// Load the route handlers for /api
+const apiRoutes = require('./routes/api')
+app.use('/api', apiRoutes)
 
 // Start the web app listening
 app.listen(port, () => console.log(`Node app listening on port ${port}!`))
