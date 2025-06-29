@@ -6,11 +6,19 @@
   </head>
   <body>
     <h1><%=shopData.shopName%> Shop</h1>
-    <h2>Here are our bargain books:</h2>
+    <h2>Here are our bargain cars:</h2>
     <ul>
-      <% availableBooks.forEach(function(book) { %>
-        <li><%= book.name %>, £<%=book.price%> </li>
+      <% availableCars.forEach(function(car) { %>
+        <li><%=car.Make%> <%=car.Model%>, <%=car.Color%>, £<%=car.Price%>, Car ID: <%=car.CarID%> - Dealer: <%=car.DealerName || 'No dealer assigned'%></li>
       <% }) %>
     </ul>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+            <p class="footer-text">© 2025 Car Inventory System - Powered by Spinning Cars!</p>
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+        </div>
+    </footer>
     </body>
 </html>

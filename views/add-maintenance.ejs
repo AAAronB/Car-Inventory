@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Maintenance Record</title>
+    <link rel="stylesheet" href="/main.css">
+</head>
+<body>
+    <h1>Add Maintenance Record</h1>
+    <form action="maintenanceadded" method="POST">
+        <div>
+            <label for="carId">Car ID:</label>
+            <input type="number" id="carId" name="carId" required>
+        </div>
+        <div>
+            <label for="serviceDate">Service Date:</label>
+            <input type="date" id="serviceDate" name="serviceDate" required>
+        </div>
+        <div>
+            <label for="serviceDetails">Service Details:</label>
+            <textarea id="serviceDetails" name="serviceDetails" required></textarea>
+        </div>
+        <div>
+            <label for="cost">Cost:</label>
+            <input type="number" id="cost" name="cost" step="0.01" required>
+        </div>
+        <button type="submit">Add Maintenance Record</button>
+    </form>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+            <p class="footer-text">© 2025 Car Inventory System - Powered by Spinning Cars!</p>
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+        </div>
+    </footer>
+</body>
+</html> 

@@ -7,9 +7,33 @@
   <body>
     <h1>Search <%=shopData.shopName%></h1>
     <form action="search_result" method="GET">
-      <p>What book do you want?</p>
-      <input id="search_box" type="text" name="search_text">
-      <input type="submit" value="Search" >
+      <p>Search for a car:</p>
+      <div class="search-fields">
+        <div>
+          <label for="make">Make:</label>
+          <input id="make" type="text" name="make" placeholder="e.g., Toyota">
+        </div>
+        <div>
+          <label for="model">Model:</label>
+          <input id="model" type="text" name="model" placeholder="e.g., Camry">
+        </div>
+        <div>
+          <label for="year">Year:</label>
+          <input id="year" type="number" name="year" min="1900" placeholder="e.g., 2020">
+        </div>
+        <div>
+          <label for="price_max">Max Price:</label>
+          <input id="price_max" type="number" name="price_max" min="0" placeholder="Maximum price">
+        </div>
+      </div>
+      <input type="submit" value="Search Cars">
     </form>
+    <footer class="footer">
+      <div class="footer-content">
+          <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+          <p class="footer-text">© 2025 Car Inventory System - Powered by Spinning Cars!</p>
+          <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+      </div>
+  </footer> 
   </body>
 </html>

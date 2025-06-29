@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Explorer - Car Inventory</title>
+    <link rel="stylesheet" href="/main.css">
+    <style>
+        .api-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .endpoint {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: white;
+            border-radius: 4px;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get { background-color: #28a745; }
+        .post { background-color: #007bff; }
+        .put { background-color: #ffc107; color: #212529; }
+        .delete { background-color: #dc3545; }
+        .url {
+            font-family: monospace;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-warning { background-color: #ffc107; color: #212529; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .response.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .response.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background-color: #f8f9fa;
+        }
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>API Explorer</h1>
+        <p>Welcome, <%= userId %>! Use this interface to test the Car Inventory API endpoints.</p>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('cars')">Cars</div>
+            <div class="tab" onclick="showTab('dealers')">Dealers</div>
+            <div class="tab" onclick="showTab('maintenance')">Maintenance</div>
+            <div class="tab" onclick="showTab('users')">Users</div>
+            <div class="tab" onclick="showTab('search')">Search</div>
+            <div class="tab" onclick="showTab('stats')">Statistics</div>
+        </div>
+
+        <!-- Cars Tab -->
+        <div id="cars" class="tab-content active">
+            <div class="api-section">
+                <h2>Cars API</h2>
+                
+                <!-- Get All Cars -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/cars</span>
+                    <p>Get all cars with dealer information</p>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/cars')">Test Endpoint</button>
+                    <div id="response-cars-get" class="response"></div>
+                </div>
+
+                <!-- Get Car by ID -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/cars/:id</span>
+                    <p>Get a specific car by ID</p>
+                    <div class="form-group">
+                        <label>Car ID:</label>
+                        <input type="number" id="car-id" placeholder="Enter car ID">
+                    </div>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/cars/' + document.getElementById('car-id').value)">Test Endpoint</button>
+                    <div id="response-cars-get-id" class="response"></div>
+                </div>
+
+                <!-- Add New Car -->
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/cars</span>
+                    <p>Add a new car</p>
+                    <div class="form-group">
+                        <label>Make:</label>
+                        <input type="text" id="car-make" placeholder="e.g., Toyota">
+                    </div>
+                    <div class="form-group">
+                        <label>Model:</label>
+                        <input type="text" id="car-model" placeholder="e.g., Camry">
+                    </div>
+                    <div class="form-group">
+                        <label>Color:</label>
+                        <input type="text" id="car-color" placeholder="e.g., Red">
+                    </div>
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <input type="number" id="car-price" placeholder="e.g., 25000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Condition:</label>
+                        <select id="car-condition">
+                            <option value="">Select condition</option>
+                            <option value="New">New</option>
+                            <option value="Used">Used</option>
+                            <option value="Certified">Certified</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dealer ID:</label>
+                        <input type="number" id="car-dealer-id" placeholder="e.g., 1">
+                    </div>
+                    <button class="btn btn-success" onclick="addCar()">Add Car</button>
+                    <div id="response-cars-post" class="response"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dealers Tab -->
+        <div id="dealers" class="tab-content">
+            <div class="api-section">
+                <h2>Dealers API</h2>
+                
+                <!-- Get All Dealers -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/dealers</span>
+                    <p>Get all dealers</p>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/dealers')">Test Endpoint</button>
+                    <div id="response-dealers-get" class="response"></div>
+                </div>
+
+                <!-- Add New Dealer -->
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/dealers</span>
+                    <p>Add a new dealer</p>
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" id="dealer-name" placeholder="e.g., ABC Motors">
+                    </div>
+                    <div class="form-group">
+                        <label>Contact:</label>
+                        <input type="text" id="dealer-contact" placeholder="e.g., (555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label>Location:</label>
+                        <input type="text" id="dealer-location" placeholder="e.g., 123 Main St, City, State">
+                    </div>
+                    <button class="btn btn-success" onclick="addDealer()">Add Dealer</button>
+                    <div id="response-dealers-post" class="response"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Tab -->
+        <div id="maintenance" class="tab-content">
+            <div class="api-section">
+                <h2>Maintenance API</h2>
+                
+                <!-- Get All Maintenance Records -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/maintenance</span>
+                    <p>Get all maintenance records</p>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/maintenance')">Test Endpoint</button>
+                    <div id="response-maintenance-get" class="response"></div>
+                </div>
+
+                <!-- Get Maintenance by Car ID -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/maintenance/:carId</span>
+                    <p>Get maintenance records for a specific car</p>
+                    <div class="form-group">
+                        <label>Car ID:</label>
+                        <input type="number" id="maintenance-car-id" placeholder="Enter car ID">
+                    </div>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/maintenance/' + document.getElementById('maintenance-car-id').value)">Test Endpoint</button>
+                    <div id="response-maintenance-get-id" class="response"></div>
+                </div>
+
+                <!-- Add Maintenance Record -->
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="url">/api/maintenance</span>
+                    <p>Add a new maintenance record</p>
+                    <div class="form-group">
+                        <label>Car ID:</label>
+                        <input type="number" id="maintenance-record-car-id" placeholder="e.g., 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Service Date:</label>
+                        <input type="date" id="maintenance-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Service Details:</label>
+                        <textarea id="maintenance-details" placeholder="e.g., Oil change, tire rotation"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Cost:</label>
+                        <input type="number" id="maintenance-cost" placeholder="e.g., 150.00" step="0.01">
+                    </div>
+                    <button class="btn btn-success" onclick="addMaintenance()">Add Maintenance Record</button>
+                    <div id="response-maintenance-post" class="response"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="api-section">
+                <h2>Users API</h2>
+                
+                <!-- Get All Users -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/users</span>
+                    <p>Get all users (names and emails only)</p>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/users')">Test Endpoint</button>
+                    <div id="response-users-get" class="response"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Tab -->
+        <div id="search" class="tab-content">
+            <div class="api-section">
+                <h2>Search API</h2>
+                
+                <!-- Search Cars -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/search/cars</span>
+                    <p>Search cars by various criteria</p>
+                    <div class="form-group">
+                        <label>Make:</label>
+                        <input type="text" id="search-make" placeholder="e.g., Toyota">
+                    </div>
+                    <div class="form-group">
+                        <label>Model:</label>
+                        <input type="text" id="search-model" placeholder="e.g., Camry">
+                    </div>
+                    <div class="form-group">
+                        <label>Condition:</label>
+                        <select id="search-condition">
+                            <option value="">Any condition</option>
+                            <option value="New">New</option>
+                            <option value="Used">Used</option>
+                            <option value="Certified">Certified</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Min Price:</label>
+                        <input type="number" id="search-min-price" placeholder="e.g., 10000" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Max Price:</label>
+                        <input type="number" id="search-max-price" placeholder="e.g., 50000" step="0.01">
+                    </div>
+                    <button class="btn btn-primary" onclick="searchCars()">Search Cars</button>
+                    <div id="response-search" class="response"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="stats" class="tab-content">
+            <div class="api-section">
+                <h2>Statistics API</h2>
+                
+                <!-- Get Statistics -->
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="url">/api/stats</span>
+                    <p>Get basic statistics about the inventory</p>
+                    <button class="btn btn-primary" onclick="callAPI('GET', '/api/stats')">Get Statistics</button>
+                    <div id="response-stats" class="response"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        async function callAPI(method, url, body = null) {
+            // Map URLs to their corresponding response div IDs
+            const responseDivMap = {
+                '/api/cars': 'response-cars-get',
+                '/api/dealers': 'response-dealers-get',
+                '/api/maintenance': 'response-maintenance-get',
+                '/api/users': 'response-users-get',
+                '/api/stats': 'response-stats',
+                '/api/search/cars': 'response-search'
+            };
+            
+            // Try to find the response div using the mapping first
+            let responseDiv = document.getElementById(responseDivMap[url]);
+            
+            // If not found in mapping, try the URL pattern
+            if (!responseDiv) {
+                responseDiv = document.getElementById('response-' + url.replace(/\//g, '-').replace(/:/g, '-'));
+            }
+            
+            // If still not found, try alternative patterns
+            if (!responseDiv) {
+                // For URLs with parameters, try without the parameter value
+                const urlWithoutParams = url.split('/').slice(0, -1).join('/') + '/:id';
+                responseDiv = document.getElementById('response-' + urlWithoutParams.replace(/\//g, '-').replace(/:/g, '-'));
+            }
+            
+            // If still not found, try a more generic approach
+            if (!responseDiv) {
+                const urlParts = url.split('/');
+                const endpoint = urlParts[urlParts.length - 1];
+                const baseEndpoint = urlParts[urlParts.length - 2];
+                
+                // Try different patterns
+                const possibleIds = [
+                    'response-' + url.replace(/\//g, '-').replace(/:/g, '-'),
+                    'response-' + baseEndpoint + '-' + method.toLowerCase(),
+                    'response-' + endpoint,
+                    'response-' + baseEndpoint
+                ];
+                
+                for (const id of possibleIds) {
+                    responseDiv = document.getElementById(id);
+                    if (responseDiv) break;
+                }
+            }
+            
+            // If still not found, create a temporary response area
+            if (!responseDiv) {
+                console.warn('Response div not found for URL:', url);
+                // Find the button that was clicked and add response after it
+                const buttons = document.querySelectorAll('button');
+                for (const button of buttons) {
+                    if (button.onclick && button.onclick.toString().includes(url)) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.className = 'response';
+                        tempDiv.id = 'temp-response-' + Date.now();
+                        button.parentNode.insertBefore(tempDiv, button.nextSibling);
+                        responseDiv = tempDiv;
+                        break;
+                    }
+                }
+            }
+            
+            if (!responseDiv) {
+                alert('Could not find response area for this endpoint. Please check the console for details.');
+                return;
+            }
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                responseDiv.className = 'response ' + (response.ok ? 'success' : 'error');
+            } catch (error) {
+                responseDiv.textContent = 'Error: ' + error.message;
+                responseDiv.className = 'response error';
+            }
+        }
+
+        function addCar() {
+            const carData = {
+                Make: document.getElementById('car-make').value,
+                Model: document.getElementById('car-model').value,
+                Color: document.getElementById('car-color').value,
+                Price: parseFloat(document.getElementById('car-price').value),
+                Condition: document.getElementById('car-condition').value,
+                DealerID: parseInt(document.getElementById('car-dealer-id').value)
+            };
+            
+            callAPI('POST', '/api/cars', carData);
+        }
+
+        function addDealer() {
+            const dealerData = {
+                Name: document.getElementById('dealer-name').value,
+                Contact: document.getElementById('dealer-contact').value,
+                Location: document.getElementById('dealer-location').value
+            };
+            
+            callAPI('POST', '/api/dealers', dealerData);
+        }
+
+        function addMaintenance() {
+            const maintenanceData = {
+                CarID: parseInt(document.getElementById('maintenance-record-car-id').value),
+                ServiceDate: document.getElementById('maintenance-date').value,
+                ServiceDetails: document.getElementById('maintenance-details').value,
+                Cost: parseFloat(document.getElementById('maintenance-cost').value)
+            };
+            
+            callAPI('POST', '/api/maintenance', maintenanceData);
+        }
+
+        function searchCars() {
+            const params = new URLSearchParams();
+            
+            if (document.getElementById('search-make').value) {
+                params.append('make', document.getElementById('search-make').value);
+            }
+            if (document.getElementById('search-model').value) {
+                params.append('model', document.getElementById('search-model').value);
+            }
+            if (document.getElementById('search-condition').value) {
+                params.append('condition', document.getElementById('search-condition').value);
+            }
+            if (document.getElementById('search-min-price').value) {
+                params.append('minPrice', document.getElementById('search-min-price').value);
+            }
+            if (document.getElementById('search-max-price').value) {
+                params.append('maxPrice', document.getElementById('search-max-price').value);
+            }
+            
+            const url = '/api/search/cars' + (params.toString() ? '?' + params.toString() : '');
+            callAPI('GET', url);
+        }
+
+        // Set default date to today for maintenance records
+        document.getElementById('maintenance-date').value = new Date().toISOString().split('T')[0];
+    </script>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+            <p class="footer-text">© 2025 Car Inventory System - Powered by Spinning Cars!</p>
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+        </div>
+    </footer>
+</body>
+</html> 

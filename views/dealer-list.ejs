@@ -6,10 +6,10 @@
   </head>
   <body>
     <h1><%=shopData.shopName%> Shop</h1>
-    <h2>Here are the all the users:</h2>
+    <h2>Here are a list of car dealers that we work with:</h2>
     <ul>
-      <% availableUsers.forEach(function(user) { %>
-        <li><%= user.Username %>, <%=user.FirstName%>, <%=user.LastName%>, <%=user.Email%> </li>
+      <% dealers.forEach(function(dealer) { %>
+        <li><%=dealer.Name%> <%=dealer.Contact%>, <%=dealer.Location%></li>
       <% }) %>
     </ul>
 

@@ -26,7 +26,7 @@ router.post('/registered', [
         const saltRounds = 10;
         // Hash the password
         bcrypt.hash(plainPassword, saltRounds, function(err, hashedPassword) {
-            let addquery = "INSERT INTO users(first_name,last_name,username,password,email,hashedPassword) VALUES (?, ?, ?, ?, ?, ?)";
+            let addquery = "INSERT INTO users(firstname,lastname,username,password,email,hashedPassword) VALUES (?, ?, ?, ?, ?, ?)";
             let newUser = [firstName, lastName, username, plainPassword, email, hashedPassword];
             
             db.query(addquery, newUser, (err) => {
@@ -50,7 +50,7 @@ const redirectLogin = (req, res, next) => {
     } 
 }
 router.get('/list', function(req, res, next) {
-    let sqlquery = "SELECT * FROM users"; // Query database to get all users
+    let sqlquery = "SELECT * FROM Users"; // Query database to get all users
     db.query(sqlquery, (err, result) => {
         if (err) {
             next(err);
@@ -101,7 +101,7 @@ router.post('/login', (req, res) => {
         const user = result[0]; // Get the first result (the user object)
         
         // Compare the password supplied with the hashed password in the database
-        bcrypt.compare(plainPassword, user.hashedPassword, (err, isMatch) => {
+        bcrypt.compare(plainPassword, user.HashedPassword, (err, isMatch) => {
             if (err) {
                 // Handle any error that occurred during password comparison
                 console.error('Error during password comparison:', err);
@@ -109,13 +109,16 @@ router.post('/login', (req, res) => {
             } else if (isMatch) {
                 // Passwords match - authentication successful
                 req.session.userId = user.username; // Store user ID in session
-                res.redirect('/'); // Redirect to the home page
+                res.render('index.ejs', { 
+                    userId: user.username,
+                    isLoggedIn: true
+                });
             } else {
                 // Passwords do not match - authentication failed
                 res.redirect('register'); // Redirect to the registration page
             }
         })
     })
-  })
+})
 // Export the router object so index.js can access it
 module.exports = router

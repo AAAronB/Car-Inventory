@@ -1,13 +1,52 @@
-# Create database script for Bettys books
+-- Create the database
+CREATE DATABASE CarInventory;
 
-# Create the database
-CREATE DATABASE IF NOT EXISTS bettys_books;
-USE bettys_books;
+-- Use the database
+USE CarInventory;
 
-# Create the tables
-CREATE TABLE IF NOT EXISTS books (id INT AUTO_INCREMENT, name VARCHAR(50), price DECIMAL(5, 2) unsigned, PRIMARY KEY(id));
-CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT, first_name VARCHAR(50), last_name VARCHAR(50), username VARCHAR(20), 
-password VARCHAR(20), email VARCHAR(50), hashedPassword VARCHAR(100), PRIMARY KEY(id));
-# Create the app user
-CREATE USER IF NOT EXISTS 'bettys_books_app'@'localhost' IDENTIFIED BY 'qwertyuiop'; 
-GRANT ALL PRIVILEGES ON bettys_books.* TO ' bettys_books_app'@'localhost';
+-- Table: Cars
+CREATE TABLE Cars (
+    CarID INT AUTO_INCREMENT PRIMARY KEY,
+    Make VARCHAR(50) NOT NULL,
+    Model VARCHAR(50) NOT NULL,
+    Color VARCHAR(20),
+    Price DECIMAL(10, 2) CHECK (Price >= 0),
+    `Condition` VARCHAR(20),
+    DealerID INT NOT NULL,
+    INDEX idx_make_model (Make, Model),
+    FOREIGN KEY (DealerID) REFERENCES Dealers(DealerID) ON DELETE CASCADE
+);
+
+-- Table: MaintenanceRecords
+CREATE TABLE MaintenanceRecords (
+    RecordID INT AUTO_INCREMENT PRIMARY KEY,
+    CarID INT NOT NULL,
+    ServiceDate DATE NOT NULL,
+    ServiceDetails TEXT,
+    Cost DECIMAL(10, 2),
+    FOREIGN KEY (CarID) REFERENCES Cars(CarID) ON DELETE CASCADE
+);
+
+-- Table: Dealers
+CREATE TABLE Dealers (
+    DealerID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Contact VARCHAR(50),
+    Location VARCHAR(255)
+);
+
+-- Table: Users
+CREATE TABLE Users (
+    UserID INT AUTO_INCREMENT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Username VARCHAR(50) UNIQUE NOT NULL,
+    Password VARCHAR(20) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    HashedPassword VARCHAR(255) NOT NULL,
+    INDEX idx_username (Username)
+);
+
+-- Create the application user
+CREATE USER IF NOT EXISTS 'car_inventory_app'@'localhost' IDENTIFIED BY 'qwertyuiop';
+GRANT ALL PRIVILEGES ON CarInventory.* TO 'car_inventory_app'@'localhost';

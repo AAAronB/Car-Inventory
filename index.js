@@ -25,6 +25,9 @@ app.set('view engine', 'ejs')
 // Set up the body parser 
 app.use(express.urlencoded({ extended: true }))
 
+// Set up JSON body parser for API endpoints
+app.use(express.json())
+
 // Set up public folder (for css and statis js)
 app.use(express.static(__dirname + '/public'))
 
@@ -34,9 +37,9 @@ app.use(expressSanitizer());
 // Define the database connection
 const db = mysql.createConnection ({
     host: 'localhost',
-    user: 'bettys_books_app',
+    user: 'car_inventory_app',
     password: 'qwertyuiop',
-    database: 'bettys_books'
+    database: 'CarInventory'
 })
 // Connect to the database
 db.connect((err) => {
@@ -48,7 +51,7 @@ db.connect((err) => {
 global.db = db
 
 // Define our application-specific data
-app.locals.shopData = {shopName: "Bettys Books"}
+app.locals.shopData = {shopName: "Car Inventory"}
 
 // Load the route handlers
 const mainRoutes = require("./routes/main")
@@ -59,8 +62,12 @@ const usersRoutes = require('./routes/users')
 app.use('/users', usersRoutes)
 
 // Load the route handlers for /books
-const booksRoutes = require('./routes/books')
-app.use('/books', booksRoutes)
+const carRoutes = require('./routes/car')
+app.use('/car', carRoutes)
+
+// Load the API routes
+const apiRoutes = require('./routes/api')
+app.use('/api', apiRoutes)
 
 // Start the web app listening
 app.listen(port, () => console.log(`Node app listening on port ${port}!`))

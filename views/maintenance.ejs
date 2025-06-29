@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Maintenance History</title>
+    <link rel="stylesheet" href="/main.css">
+</head>
+<body>
+    <h1>Maintenance History</h1>
+    <% if (maintenanceHistory && maintenanceHistory.length > 0) { %>
+        <table>
+            <thead>
+                <tr>
+                    <th>Service Date</th>
+                    <th>Service Type</th>
+                    <th>Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% maintenanceHistory.forEach(function(record) { %>
+                    <tr>
+                        <td><%= record.service_date ? record.service_date.toISOString().slice(0,10) : record.ServiceDate ? record.ServiceDate.toISOString().slice(0,10) : '' %></td>
+                        <td><%= record.service_type || record.ServiceDetails %></td>
+                        <td>£<%= record.cost || record.Cost %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } else { %>
+        <p>No maintenance records found for this car.</p>
+    <% } %>
+    <a href="/users/login">Back to Home</a>
+    <footer class="footer">
+        <div class="footer-content">
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+            <p class="footer-text">© 2025 Car Inventory System - Powered by Spinning Cars!</p>
+            <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
+        </div>
+    </footer>
+</body>
+</html>
