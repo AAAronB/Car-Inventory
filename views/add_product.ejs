@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Add product to <%=shopData.shopName%></title>
+    <link rel="stylesheet"  type="text/css" href="/main.css" />
+  </head>
+  <body>
+    <h1><%=shopData.shopName%>: Add product</h1>
+    <form method="POST" action="product_added">
+        <p>Product model: <input id="model" type="text" name="model" value="" /></p>
+        <p>Product type: <input id="type" type="text" name="type" value="" /></p>
+        <p>Price: <input id="price" type="text" name="price" value="" /></p>
+        <input type="submit" value="Add product" />
+      </form>
+  </body>
+</html>
+
