@@ -16,7 +16,7 @@ router.get('/cars', (req, res) => {
 
 // GET /api/cars/:id - Get car by ID
 router.get('/cars/:id', (req, res) => {
-    const carId = req.params.id;
+    const carId = req.sanitize(req.params.id);
     const sqlquery = "SELECT c.*, d.Name as DealerName, d.Location as DealerLocation FROM Cars c LEFT JOIN Dealers d ON c.DealerID = d.DealerID WHERE c.CarID = ?";
     
     db.query(sqlquery, [carId], (err, result) => {
@@ -42,7 +42,13 @@ router.post('/cars', [
         return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
-    const { Make, Model, Color, Price, Condition, DealerID } = req.body;
+    const Make = req.sanitize(req.body.Make);
+    const Model = req.sanitize(req.body.Model);
+    const Color = req.sanitize(req.body.Color);
+    const Price = parseFloat(req.sanitize(req.body.Price));
+    const Condition = req.sanitize(req.body.Condition);
+    const DealerID = parseInt(req.sanitize(req.body.DealerID));
+    
     const sqlquery = "INSERT INTO Cars (Make, Model, Color, Price, `Condition`, DealerID) VALUES (?, ?, ?, ?, ?, ?)";
     
     db.query(sqlquery, [Make, Model, Color, Price, Condition, DealerID], (err, result) => {
@@ -68,8 +74,14 @@ router.put('/cars/:id', [
         return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
-    const carId = req.params.id;
-    const { Make, Model, Color, Price, Condition, DealerID } = req.body;
+    const carId = req.sanitize(req.params.id);
+    const Make = req.sanitize(req.body.Make);
+    const Model = req.sanitize(req.body.Model);
+    const Color = req.sanitize(req.body.Color);
+    const Price = parseFloat(req.sanitize(req.body.Price));
+    const Condition = req.sanitize(req.body.Condition);
+    const DealerID = parseInt(req.sanitize(req.body.DealerID));
+    
     const sqlquery = "UPDATE Cars SET Make = ?, Model = ?, Color = ?, Price = ?, `Condition` = ?, DealerID = ? WHERE CarID = ?";
     
     db.query(sqlquery, [Make, Model, Color, Price, Condition, DealerID, carId], (err, result) => {
@@ -85,7 +97,7 @@ router.put('/cars/:id', [
 
 // DELETE /api/cars/:id - Delete car
 router.delete('/cars/:id', (req, res) => {
-    const carId = req.params.id;
+    const carId = req.sanitize(req.params.id);
     const sqlquery = "DELETE FROM Cars WHERE CarID = ?";
     
     db.query(sqlquery, [carId], (err, result) => {
@@ -120,7 +132,10 @@ router.post('/dealers', [
         return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
-    const { Name, Contact, Location } = req.body;
+    const Name = req.sanitize(req.body.Name);
+    const Contact = req.sanitize(req.body.Contact);
+    const Location = req.sanitize(req.body.Location);
+    
     const sqlquery = "INSERT INTO Dealers (Name, Contact, Location) VALUES (?, ?, ?)";
     
     db.query(sqlquery, [Name, Contact, Location], (err, result) => {
@@ -149,7 +164,7 @@ router.get('/maintenance', (req, res) => {
 
 // GET /api/maintenance/:carId - Get maintenance records for specific car
 router.get('/maintenance/:carId', (req, res) => {
-    const carId = req.params.carId;
+    const carId = req.sanitize(req.params.carId);
     const sqlquery = "SELECT m.*, c.Make, c.Model FROM MaintenanceRecords m LEFT JOIN Cars c ON m.CarID = c.CarID WHERE m.CarID = ?";
     
     db.query(sqlquery, [carId], (err, result) => {
@@ -171,7 +186,11 @@ router.post('/maintenance', [
         return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
-    const { CarID, ServiceDate, ServiceDetails, Cost } = req.body;
+    const CarID = parseInt(req.sanitize(req.body.CarID));
+    const ServiceDate = req.sanitize(req.body.ServiceDate);
+    const ServiceDetails = req.sanitize(req.body.ServiceDetails);
+    const Cost = req.body.Cost ? parseFloat(req.sanitize(req.body.Cost)) : null;
+    
     const sqlquery = "INSERT INTO MaintenanceRecords (CarID, ServiceDate, ServiceDetails, Cost) VALUES (?, ?, ?, ?)";
     
     db.query(sqlquery, [CarID, ServiceDate, ServiceDetails, Cost], (err, result) => {
@@ -200,7 +219,12 @@ router.get('/users', (req, res) => {
 
 // GET /api/search/cars - Search cars by make, model, or condition
 router.get('/search/cars', (req, res) => {
-    const { make, model, condition, minPrice, maxPrice } = req.query;
+    const make = req.sanitize(req.query.make);
+    const model = req.sanitize(req.query.model);
+    const condition = req.sanitize(req.query.condition);
+    const minPrice = req.query.minPrice ? parseFloat(req.sanitize(req.query.minPrice)) : null;
+    const maxPrice = req.query.maxPrice ? parseFloat(req.sanitize(req.query.maxPrice)) : null;
+    
     let sqlquery = "SELECT c.*, d.Name as DealerName FROM Cars c LEFT JOIN Dealers d ON c.DealerID = d.DealerID WHERE 1=1";
     const params = [];
 
@@ -218,11 +242,11 @@ router.get('/search/cars', (req, res) => {
     }
     if (minPrice) {
         sqlquery += " AND c.Price >= ?";
-        params.push(parseFloat(minPrice));
+        params.push(minPrice);
     }
     if (maxPrice) {
         sqlquery += " AND c.Price <= ?";
-        params.push(parseFloat(maxPrice));
+        params.push(maxPrice);
     }
 
     db.query(sqlquery, params, (err, result) => {

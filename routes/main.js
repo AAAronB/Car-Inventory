@@ -2,6 +2,7 @@
 const express = require("express")
 const router = express.Router()
 const request = require('request')
+const { sanitize } = require('express-validator')
 
 // Middleware to check if user is authenticated
 const requireAuth = (req, res, next) => {
@@ -15,6 +16,10 @@ const requireAuth = (req, res, next) => {
 // Handle our routes
 router.get('/',function(req, res, next){
     res.render('login.ejs')
+})
+
+router.get('/index',function(req, res, next){
+    res.render('index.ejs')
 })
 
 router.get('/about',function(req, res, next){
@@ -32,7 +37,7 @@ router.get('/weather', function(req, res, next) {
 
 router.get('/city_weather', function(req, res, next) {
   let apiKey = 'efe9ce8321b74a217c902e42eae9b158';
-  let city = req.query.city;
+  let city = req.sanitize(req.query.city);
   let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
 
   request(url, function(err, response, body) {

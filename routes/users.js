@@ -60,7 +60,7 @@ router.get('/list', function(req, res, next) {
 })
 
 router.get('/loggedIn', (req, res) => {
-  req.session.userId = req.body.username;
+  req.session.userId = req.sanitize(req.body.username);
   res.render('index.ejs',{ userId: req.session.userId })
 })
 

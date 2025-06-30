@@ -9,17 +9,16 @@ router.get('/search', function(req, res, next){
 router.get('/search_result', [
     check('make').optional(),
     check('model').optional(),
-    check('year').optional().isNumeric().custom(value => value >= 1900),
+    check('color').optional(),
     check('price_max').optional().isNumeric().custom(value => value >= 0)
 ], function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.redirect('/search');
     }
-
     const make = req.sanitize(req.query.make);
     const model = req.sanitize(req.query.model);
-    const year = req.sanitize(req.query.year);
+    const color = req.sanitize(req.query.color);
     const price_max = req.sanitize(req.query.price_max);
     let sqlquery = "SELECT * FROM cars WHERE 1=1";
     let params = [];
@@ -32,9 +31,9 @@ router.get('/search_result', [
         sqlquery += " AND model LIKE ?";
         params.push(`%${model}%`);
     }
-    if (year) {
-        sqlquery += " AND year = ?";
-        params.push(year);
+    if (color) {
+        sqlquery += " AND color = ?";
+        params.push(color);
     }
     if (price_max) {
         sqlquery += " AND price <= ?";
@@ -127,25 +126,50 @@ router.get('/check-maintenance', function(req, res, next) {
 })
 
 router.get('/maintenance', function(req, res, next) {
-    let carQuery = "SELECT CarID FROM Cars WHERE Make = ? AND Model = ?";
-    db.query(carQuery, [req.query.make, req.query.model], (err, carResult) => {
-        if (err) {
-            return next(err);
-        }
-        if (!carResult.length) {
-            return res.render("maintenance.ejs", { maintenanceHistory: [] });
-        }
-        const carId = carResult[0].CarID;
-        //console.log(carId);
+    const make = req.sanitize(req.query.make);
+    const model = req.sanitize(req.query.model);
 
-        let sqlquery = "SELECT * FROM maintenancerecords WHERE CarID = ? ORDER BY ServiceDate DESC"
+    if (!make || !model) {
+        return res.render("maintenance.ejs", { 
+            maintenanceHistory: [],
+            error: 'Please provide both make and model to search maintenance records.'
+        });
+    }
+
+    const carQuery = "SELECT CarID, Make, Model FROM Cars WHERE Make = ? AND Model = ?";
+    db.query(carQuery, [make, model], (err, carResult) => {
+        if (err) {
+            console.error('Maintenance search error:', err);
+            return res.status(500).render("maintenance.ejs", { 
+                error: 'Database error occurred while searching for the car.',
+                maintenanceHistory: []
+            });
+        }
+
+        if (!carResult.length) {
+            return res.render("maintenance.ejs", { 
+                maintenanceHistory: [],
+                error: `No car found with make "${make}" and model "${model}".`
+            });
+        }
+
+        const carId = carResult[0].CarID;
+        const sqlquery = "SELECT * FROM MaintenanceRecords WHERE CarID = ? ORDER BY ServiceDate DESC";
+        
         db.query(sqlquery, [carId], (err, result) => {
             if (err) {
-                next(err)
+                console.error('Maintenance history error:', err);
+                return res.status(500).render("maintenance.ejs", { 
+                    error: 'Database error occurred while loading maintenance history.',
+                    maintenanceHistory: []
+                });
             }
-            res.render("maintenance.ejs", {maintenanceHistory:result})
-        })
-    })
+            res.render("maintenance.ejs", {
+                maintenanceHistory: result,
+                carInfo: carResult[0]
+            });
+        });
+    });
 })
 
 router.get('/addmaintenance', function(req, res, next){

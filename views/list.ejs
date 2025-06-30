@@ -12,8 +12,11 @@
         <li><%=car.Make%> <%=car.Model%>, <%=car.Color%>, £<%=car.Price%>, Car ID: <%=car.CarID%> 
           - Dealer: <%=car.DealerName || 'No dealer assigned'%></li>
       <% }) %>
+      <li>
+      <button><a href="/index" class="home-btn"> Home</a></button>
+      </li>
     </ul>
-
+    
     <footer class="footer">
         <div class="footer-content">
             <img src="/images/spinning-car.gif" alt="Spinning Car" class="spinning-car">
