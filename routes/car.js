@@ -232,36 +232,5 @@ router.post('/dealeradded', [
     }
 })
 
-router.get('/addowner', function(req, res, next) {
-    res.render('add-owner.ejs')
-})
-
-router.post('/owneradded', [
-    check('car_id').notEmpty().isNumeric(),
-    check('name').notEmpty(),
-    check('email').notEmpty().isEmail(),
-    check('phone').notEmpty(),
-    check('address').notEmpty()
-], function(req, res, next) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.redirect('/addowner')
-    } else {
-        let sqlquery = "INSERT INTO owners (car_id, name, email, phone, address) VALUES (?, ?, ?, ?, ?)";
-        let newrecord = [
-            req.sanitize(req.body.car_id),
-            req.sanitize(req.body.name),
-            req.sanitize(req.body.email),
-            req.sanitize(req.body.phone),
-            req.sanitize(req.body.address)
-        ];
-        db.query(sqlquery, newrecord, (err, result) => {
-            if (err) {
-                return next(err);
-            }
-            res.redirect('/');
-        })
-    }
-})
 
 module.exports = router
