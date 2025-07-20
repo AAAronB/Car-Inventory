@@ -96,7 +96,7 @@ router.post('/caradded', [
     check('model').notEmpty(),
     check('price').notEmpty().isNumeric().custom(value => value >= 0),
     check('color').notEmpty(),
-    check('condition').notEmpty(),
+    check('condition').isIn(['new', 'used', 'certified']).withMessage('Condition must be new, used, or certified'),
     check('dealer').notEmpty().isNumeric() // Add validation for dealer
 ], function (req, res, next) {
     const errors = validationResult(req);

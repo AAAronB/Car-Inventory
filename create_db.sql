@@ -11,7 +11,7 @@ CREATE TABLE Cars (
     Model VARCHAR(50) NOT NULL,
     Color VARCHAR(20),
     Price DECIMAL(10, 2) CHECK (Price >= 0),
-    `Condition` VARCHAR(20),
+    `Condition` ENUM('used', 'new', 'certified'),
     DealerID INT NOT NULL,
     INDEX idx_make_model (Make, Model),
     FOREIGN KEY (DealerID) REFERENCES Dealers(DealerID) ON DELETE CASCADE

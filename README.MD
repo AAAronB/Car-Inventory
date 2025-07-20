@@ -98,7 +98,7 @@ The application will be available at `http://localhost:8000`
    - **Model**: Car model
    - **Color**: Car color
    - **Price**: Car price (must be positive)
-   - **Condition**: New, Used, or Certified
+   - **Condition**: new, used, or certified (ENUM values)
    - **Dealer**: Select from existing dealers
 3. Click "Add Car" to save the car
 
@@ -194,7 +194,7 @@ The application will be available at `http://localhost:8000`
 ## 🔧 Technical Details
 
 ### Database Schema
-- **Cars**: Car inventory with make, model, price, condition, dealer
+- **Cars**: Car inventory with make, model, price, condition (ENUM: new, used, certified), dealer
 - **Dealers**: Dealer information with name, contact, location
 - **MaintenanceRecords**: Service history with dates, details, costs
 - **Users**: User accounts with authentication

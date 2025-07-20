@@ -9,7 +9,7 @@
     <h2>Here are the cars that we sell:</h2>
     <ul>
       <% availableCars.forEach(function(car) { %>
-        <li><%=car.Make%> <%=car.Model%>, <%=car.Color%>, £<%=car.Price%>, Car ID: <%=car.CarID%> 
+        <li><%=car.Make%> <%=car.Model%>, <%=car.Color%>, £<%=car.Price%>, <%=car.Condition%>, Car ID: <%=car.CarID%> 
           - Dealer: <%=car.DealerName || 'No dealer assigned'%></li>
       <% }) %>
       <li>

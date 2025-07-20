@@ -35,7 +35,8 @@ router.post('/cars', [
     check('Make').notEmpty().withMessage('Make is required'),
     check('Model').notEmpty().withMessage('Model is required'),
     check('Price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
-    check('DealerID').isInt({ min: 1 }).withMessage('Valid DealerID is required')
+    check('DealerID').isInt({ min: 1 }).withMessage('Valid DealerID is required'),
+    check('Condition').isIn(['new', 'used', 'certified']).withMessage('Condition must be new, used, or certified')
 ], (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -67,7 +68,8 @@ router.post('/cars', [
 router.put('/cars/:id', [
     check('Make').notEmpty().withMessage('Make is required'),
     check('Model').notEmpty().withMessage('Model is required'),
-    check('Price').isFloat({ min: 0 }).withMessage('Price must be a positive number')
+    check('Price').isFloat({ min: 0 }).withMessage('Price must be a positive number'),
+    check('Condition').isIn(['new', 'used', 'certified']).withMessage('Condition must be new, used, or certified')
 ], (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
